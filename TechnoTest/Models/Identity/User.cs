@@ -1,4 +1,5 @@
 ﻿using System;
+using TechnoTest.ViewModels;
 
 namespace TechnoTest.Models.Identity
 {
@@ -9,9 +10,9 @@ namespace TechnoTest.Models.Identity
         public DateTime RegistrationDate { get; set; }
 
         public int UserGroupId { get; set; }
-        public UserGroup UserGroup { get; set; }
+        public UserGroup UserGroup { get; set; } = new();
         
         public int UserStateId { get; set; }
-        public UserState UserState { get; set; }
+        public UserState UserState { get; set; } = new();
     }
 }
