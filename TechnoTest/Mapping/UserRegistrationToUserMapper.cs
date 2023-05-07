@@ -12,9 +12,6 @@ public static class UserRegistrationToUserMapper
         {
             Login = vm.Login,
             Password = vm.Password,
-            RegistrationDate = DateTime.Now,
-            UserGroup = new UserGroup() { Code = string.IsNullOrEmpty(vm.UserGroupCode) ? "User" : vm.UserGroupCode},
-            UserState = new UserState() { Code = "Active" }
         };
     }
 }
