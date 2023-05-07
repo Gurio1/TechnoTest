@@ -1,15 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using TechnoTest.Models.Identity;
 
 namespace TechnoTest.ViewModels
 {
     public class UserRegistrationViewModel
     {
-        [Required]
-        public string Login { get; set; }
+        [Required] public string Login { get; init; } = default!;
         
         [Required]
-        public string Password { get; set; }
+        public string Password { get; init; } = default!;
         
-        public string UserGroupCode { get; set; }
+        public string UserGroupCode { get; init; } = default!;
     }
 }

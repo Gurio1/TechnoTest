@@ -5,11 +5,11 @@ namespace TechnoTest.ViewModels
 {
     public class UserViewModel
     {
-        public int  Id { get; set; }
-        public string Login { get; set; }
-        public DateTime RegistrationDate { get; set; }
+        public int  Id { get; init; }
+        public string Login { get; init; }
+        public DateTime RegistrationDate { get; init; }
         
-        public UserGroup UserGroup { get; set; }
-        public UserState UserState { get; set; }
+        public UserGroup UserGroup { get; init; }
+        public UserState UserState { get; init; }
     }
 }
