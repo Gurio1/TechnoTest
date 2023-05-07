@@ -6,5 +6,7 @@ namespace TechnoTest.Infrastructure.Repositories.Abstractions;
 
 public interface IUserRepository
 {
-    Task<User> GetByIdAsync(int id, IBaseSpecifications<User> baseSpecifications = null);
+    Task<User> GetAsync(IBaseSpecifications<User> baseSpecifications);
+
+    Task<User> CreateAsync(User user);
 }

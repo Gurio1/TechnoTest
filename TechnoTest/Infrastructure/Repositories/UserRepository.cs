@@ -18,7 +18,7 @@ namespace TechnoTest.Infrastructure.Repositories
             _context = context;
         }
         
-        public async Task<User> GetByIdAsync(int id, IBaseSpecifications<User> baseSpecifications = null)
+        public async Task<User> GetAsync(IBaseSpecifications<User> baseSpecifications)
         {
             try
             {
@@ -29,14 +29,41 @@ namespace TechnoTest.Infrastructure.Repositories
 
                 if (user == null)
                 {
-                    throw new Exception($"Couldn't find user with id={id}");
+                    throw new Exception($"No user was found who satisfied the specifications.");
                 }
 
                 return user;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Couldn't retrieve user with id={id}: {ex.Message}");
+                throw new Exception(ex.Message);
+            }
+        }
+        
+        public async Task<User> CreateAsync(User user)
+        {
+            try
+            {
+                var existingGroup = await _context.UserGroups.FindAsync(user.UserGroup.Code);
+                var existingState = await _context.UserStates.FindAsync(user.UserState.Code);
+
+                if (existingGroup == null || existingState == null)
+                {
+                    return null;
+                }
+
+                user.UserGroup = existingGroup;
+                user.UserState = existingState;
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Couldn't create user: {ex.Message}");
             }
         }
     }
