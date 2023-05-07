@@ -12,6 +12,9 @@ public class AndSpecification<T> : BaseSpecifications<T>
     {
         _left = left;
         _right = right;
+        
+        Includes.AddRange(left.Includes);
+        Includes.AddRange(right.Includes);
     }
 
     public Expression<Func<T, bool>> GetExpression()
