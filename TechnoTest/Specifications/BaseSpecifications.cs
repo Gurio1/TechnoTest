@@ -8,7 +8,7 @@ namespace TechnoTest.Specifications
 {
     public class BaseSpecifications<T> : IBaseSpecifications<T>
     {
-        public Expression<Func<T, bool>> FilterCondition { get; private set; }
+        public virtual Expression<Func<T, bool>> FilterCondition { get; private set; }
         public List<Expression<Func<T, object>>> Includes { get; } = new();
 
         public BaseSpecifications() { }
