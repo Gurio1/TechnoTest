@@ -16,14 +16,32 @@ public class AndSpecification<T> : BaseSpecifications<T>
         Includes.AddRange(left.Includes);
         Includes.AddRange(right.Includes);
     }
+    
+    public override Expression<Func<T, bool>> FilterCondition => GetFilterExpression();
 
-    public Expression<Func<T, bool>> GetExpression()
+    private Expression<Func<T, bool>> GetFilterExpression()
     {
-        var leftExpression = _left.FilterCondition;
-        var rightExpression = _right.FilterCondition;
+        var leftExpression = _left?.FilterCondition;
+        var rightExpression = _right?.FilterCondition;
+
+        if (leftExpression == null && rightExpression == null)
+        {
+            return null;
+        }
+        else if (leftExpression == null)
+        {
+            return rightExpression;
+        }
+        else if (rightExpression == null)
+        {
+            return leftExpression;
+        }
 
         var paramExpr = Expression.Parameter(typeof(T));
-        var exprBody = Expression.AndAlso(leftExpression.Body, rightExpression.Body);
+        var exprBody = Expression.AndAlso(
+            Expression.Invoke(leftExpression, paramExpr),
+            Expression.Invoke(rightExpression, paramExpr)
+        );
 
         exprBody = (BinaryExpression)new ParameterReplacer(paramExpr).Visit(exprBody);
 
