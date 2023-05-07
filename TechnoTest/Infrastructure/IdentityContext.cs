@@ -13,6 +13,16 @@ namespace TechnoTest.Infrastructure
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Seed UserGroup
+            modelBuilder.Entity<UserGroup>().HasData(
+                new UserGroup() { Id = 1, Code = "Admin", Description = "Administrator" },
+                new UserGroup() { Id = 2, Code = "User", Description = "Regular User" });
+
+            // Seed UserState
+            modelBuilder.Entity<UserState>().HasData(
+                new UserState() { Id = 1, Code = "Active", Description = "Active User" },
+                new UserState() { Id = 2, Code = "Blocked", Description = "Blocked User" });
+
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
         }
