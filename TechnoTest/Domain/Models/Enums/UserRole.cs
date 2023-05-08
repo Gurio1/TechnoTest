@@ -1,4 +1,4 @@
-﻿namespace TechnoTest.Models.Enums;
+﻿namespace TechnoTest.Domain.Models.Enums;
 
 public enum UserRole
 {

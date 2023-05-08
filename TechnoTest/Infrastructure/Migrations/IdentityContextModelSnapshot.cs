@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechnoTest.Infrastructure;
 
+#nullable disable
+
 namespace TechnoTest.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityContext))]
@@ -15,16 +17,18 @@ namespace TechnoTest.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.17")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("TechnoTest.Models.Identity.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Login")
                         .HasColumnType("text");
@@ -47,26 +51,16 @@ namespace TechnoTest.Infrastructure.Migrations
 
                     b.HasIndex("UserStateId");
 
-                    b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Login = "Andrey",
-                            Password = "123456",
-                            RegistrationDate = new DateTime(2023, 5, 5, 20, 34, 42, 463, DateTimeKind.Utc).AddTicks(5599),
-                            UserGroupId = 0,
-                            UserStateId = 0
-                        });
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TechnoTest.Models.Identity.UserGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -79,15 +73,30 @@ namespace TechnoTest.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User_Groups");
+                    b.ToTable("User_Groups", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "Admin",
+                            Description = "Administrator"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "User",
+                            Description = "Regular User"
+                        });
                 });
 
             modelBuilder.Entity("TechnoTest.Models.Identity.UserState", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -100,7 +109,21 @@ namespace TechnoTest.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User_States");
+                    b.ToTable("User_States", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "Active",
+                            Description = "Active User"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "Blocked",
+                            Description = "Blocked User"
+                        });
                 });
 
             modelBuilder.Entity("TechnoTest.Models.Identity.User", b =>

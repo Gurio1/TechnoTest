@@ -1,70 +1,48 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using TechnoTest.Domain.Models;
+using TechnoTest.Domain.Models.Identity;
 using TechnoTest.Infrastructure.Repositories.Abstractions;
-using TechnoTest.Models.Identity;
-using TechnoTest.Specifications;
-using TechnoTest.Specifications.Abstraction;
+using TechnoTest.Services.Abstractions;
 
 namespace TechnoTest.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : GenericRepository<User>, IUserRepository
     {
         private readonly IdentityContext _context;
+        private readonly IUserGroupService _userGroupService;
+        private readonly IUserStateService _userStateService;
 
-        public UserRepository(IdentityContext context)
+        public UserRepository(IdentityContext context, IUserGroupService userGroupService,
+            IUserStateService userStateService) : base(context)
         {
             _context = context;
+            _userGroupService = userGroupService;
+            _userStateService = userStateService;
         }
-        
-        public async Task<User> GetAsync(IBaseSpecifications<User> baseSpecifications)
+
+        public async Task<Result<User>> CreateAsync(User user)
         {
-            try
+            var getGroupResult = await _userGroupService.GetByCodeAsync(user.UserGroup.Code, true);
+
+            if (!getGroupResult.IsSuccessful)
             {
-                var user = await SpecificationEvaluator<User>
-                    .GetQuery(_context.Set<User>(), baseSpecifications)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync();
-
-                if (user == null)
-                {
-                    throw new Exception($"No user was found who satisfied the specifications.");
-                }
-
-                return user;
+                return new Result<User>(getGroupResult.GetException());
             }
-            catch (Exception ex)
+
+            user.UserGroup = getGroupResult.GetValue();
+
+            var getStateResult = await _userStateService.GetByCodeAsync(user.UserState.Code, true);
+
+            if (!getStateResult.IsSuccessful)
             {
-                throw new Exception(ex.Message);
+                return new Result<User>(getStateResult.GetException());
             }
-        }
-        
-        public async Task<User> CreateAsync(User user)
-        {
-            try
-            {
-                var existingGroup = await _context.UserGroups.FindAsync(user.UserGroup.Code);
-                var existingState = await _context.UserStates.FindAsync(user.UserState.Code);
 
-                if (existingGroup == null || existingState == null)
-                {
-                    return null;
-                }
+            user.UserState = getStateResult.GetValue();
 
-                user.UserGroup = existingGroup;
-                user.UserState = existingState;
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                
-
-                return user;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Couldn't create user: {ex.Message}");
-            }
+            return new Result<User>(user);
         }
     }
 }

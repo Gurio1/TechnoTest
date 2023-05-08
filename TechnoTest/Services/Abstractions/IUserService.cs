@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
-using TechnoTest.Models.Identity;
-using TechnoTest.ViewModels;
+﻿using TechnoTest.Contracts;
+using TechnoTest.Domain.Models;
+using TechnoTest.Domain.Models.Identity;
 
 namespace TechnoTest.Services.Abstractions;
 
 public interface IUserService
 {
-    Task<UserViewModel> GetAsync(int id);
-    Task<UserViewModel> CreateAsync(User user,string role);
+    Task<Result<UserViewModel>> GetWithGroupAndStateAsync(int id, bool enableTracking = false);
+    Task<Result<IEnumerable<UserViewModel>>> GetAllWithGroupAndStateAsync(bool enableTracking = false);
+    Task<Result<UserViewModel>> CreateAsync(User user, string role);
 }

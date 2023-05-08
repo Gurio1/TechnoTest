@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using TechnoTest.Contracts;
+using TechnoTest.Contracts.Response;
+using TechnoTest.Domain.Exceptions;
 using TechnoTest.Mapping;
 using TechnoTest.Services.Abstractions;
-using TechnoTest.ViewModels;
 
 namespace TechnoTest.Controllers
 {
@@ -16,33 +17,44 @@ namespace TechnoTest.Controllers
         {
             _userService = userService;
         }
-        
+
         [HttpGet]
-        /*public async Task<ActionResult<List<User>>> GetAll()
+        public async Task<ActionResult<List<UserViewModel>>> GetAll()
         {
-            var users = await _db.Users.ToListAsync();
+            var result = await _userService.GetAllWithGroupAndStateAsync();
 
-            return users;
-        }*/
-        
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserViewModel>> Get(int id)
-        {
-            var user = await _userService.GetAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user);
+            return result.IsSuccessful ? Ok(result.GetValue()) : CreateErrorResponse(result.GetException());
         }
-        
-        [HttpPost]
-        public async Task<CreatedAtActionResult> Post(UserRegistrationViewModel userVm)
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserViewModel>> GetById(int id)
         {
-            var user = await _userService.CreateAsync(userVm.ToUser(),userVm.UserGroupCode);
-            
-            return CreatedAtAction(nameof(Get), new { id = user.Id }, null);
+            var result = await _userService.GetWithGroupAndStateAsync(id);
+
+            return result.IsSuccessful ? Ok(result.GetValue()) : CreateErrorResponse(result.GetException());
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<UserViewModel>> Create(UserRegistrationViewModel userVm)
+        {
+            var result = await _userService.CreateAsync(userVm.ToUser(), userVm.UserGroupCode);
+
+            if (!result.IsSuccessful) return CreateErrorResponse(result.GetException());
+
+            var user = result.GetValue();
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+        }
+
+        private ObjectResult CreateErrorResponse(StatusCodeException exception)
+        {
+            var errorResponse = new ErrorApiResponse();
+            errorResponse.Errors.Add(exception.Message);
+            errorResponse.Status = (int)exception.StatusCode;
+
+            return new ObjectResult(errorResponse)
+            {
+                StatusCode = (int)exception.StatusCode,
+            };
         }
     }
 }

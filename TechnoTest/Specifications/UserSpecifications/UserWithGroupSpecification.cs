@@ -1,4 +1,4 @@
-﻿using TechnoTest.Models.Identity;
+﻿using TechnoTest.Domain.Models.Identity;
 
 namespace TechnoTest.Specifications.UserSpecifications;
 
@@ -6,6 +6,6 @@ public class UserWithGroupSpecification : BaseSpecifications<User>
 {
     public UserWithGroupSpecification()
     {
-        AddInclude(p =>p.UserGroup);
+        AddInclude(p => p.UserGroup);
     }
 }

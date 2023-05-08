@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechnoTest.Models.Identity;
+using TechnoTest.Domain.Models.Identity;
 
 namespace TechnoTest.Infrastructure.EntityTypeConfiguration.Identity
 {
@@ -18,7 +17,7 @@ namespace TechnoTest.Infrastructure.EntityTypeConfiguration.Identity
             builder.HasOne(c => c.UserState)
                 .WithMany()
                 .HasForeignKey(c => c.UserStateId);
-            
+
             builder.Property(e => e.RegistrationDate)
                 .HasColumnType("timestamp without time zone")
                 .HasConversion(

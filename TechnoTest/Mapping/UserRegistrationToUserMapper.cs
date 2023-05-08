@@ -1,6 +1,5 @@
-﻿using System;
-using TechnoTest.Models.Identity;
-using TechnoTest.ViewModels;
+﻿using TechnoTest.Contracts;
+using TechnoTest.Domain.Models.Identity;
 
 namespace TechnoTest.Mapping;
 

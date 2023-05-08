@@ -1,4 +1,4 @@
-﻿namespace TechnoTest.Models;
+﻿namespace TechnoTest.Domain.Models;
 
 public class BaseEntity
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace TechnoTest.Specifications;
 
@@ -8,21 +7,27 @@ public class AndSpecification<T> : BaseSpecifications<T>
     private readonly BaseSpecifications<T> _left;
     private readonly BaseSpecifications<T> _right;
 
-    public AndSpecification(BaseSpecifications<T> left,BaseSpecifications<T> right)
+    public AndSpecification(BaseSpecifications<T> left, BaseSpecifications<T> right)
     {
         _left = left;
         _right = right;
-        
-        Includes.AddRange(left.Includes);
-        Includes.AddRange(right.Includes);
-    }
-    
-    public override Expression<Func<T, bool>> FilterCondition => GetFilterExpression();
 
-    private Expression<Func<T, bool>> GetFilterExpression()
+        SetIncludes(left.Includes, right.Includes);
+    }
+
+    private void SetIncludes(List<Expression<Func<T, object>>> leftIncludes,
+        List<Expression<Func<T, object>>> rightIncludes)
     {
-        var leftExpression = _left?.FilterCondition;
-        var rightExpression = _right?.FilterCondition;
+        Includes.AddRange(leftIncludes);
+        Includes.AddRange(rightIncludes);
+    }
+
+    public override Expression<Func<T, bool>>? FilterCondition => GetFilterExpression();
+
+    private Expression<Func<T, bool>>? GetFilterExpression()
+    {
+        var leftExpression = _left.FilterCondition;
+        var rightExpression = _right.FilterCondition;
 
         if (leftExpression == null && rightExpression == null)
         {

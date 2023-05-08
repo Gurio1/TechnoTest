@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TechnoTest.Models.Enums;
+﻿using TechnoTest.Domain.Models.Enums;
 
-namespace TechnoTest.Models.Identity
+namespace TechnoTest.Domain.Models.Identity
 {
     public class UserGroup : BaseEntity
     {

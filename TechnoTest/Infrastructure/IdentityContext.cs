@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using TechnoTest.Models.Identity;
+using TechnoTest.Domain.Models.Identity;
 
 namespace TechnoTest.Infrastructure
 {
@@ -8,9 +8,8 @@ namespace TechnoTest.Infrastructure
     {
         public IdentityContext(DbContextOptions<IdentityContext> options) : base(options)
         {
-        
         }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Seed UserGroup

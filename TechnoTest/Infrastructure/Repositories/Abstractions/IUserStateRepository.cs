@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using TechnoTest.Domain.Models;
 using TechnoTest.Domain.Models.Identity;
+using TechnoTest.Specifications.Abstraction;
 
 namespace TechnoTest.Infrastructure.Repositories.Abstractions;
 
-public interface IUserRepository : IGenericRepository<User>
+public interface IUserStateRepository : IGenericRepository<UserState>
 {
-    Task<Result<User>> CreateAsync(User user);
 }
