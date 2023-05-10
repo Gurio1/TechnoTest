@@ -10,5 +10,5 @@ public interface IUserService
     Task<Result<List<UserViewModel>>> GetAllWithGroupAndStateAsync(bool enableTracking = false);
     Task<Result<UserViewModel>> CreateAsync(User user);
     Task<Result<UserViewModel>> GetUserByNameAsync(string login, bool enableTracking = false);
-    Task<Result<UserViewModel>> DeleteUserAsync(User user);
+    Task<Result<UserViewModel>> DeleteUserAsync(int id);
 }

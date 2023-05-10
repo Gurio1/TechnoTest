@@ -1,4 +1,5 @@
 ﻿using TechnoTest.Contracts;
+using TechnoTest.Domain.Exceptions;
 using TechnoTest.Domain.Models;
 using TechnoTest.Domain.Models.Enums;
 using TechnoTest.Domain.Models.Identity;
@@ -24,6 +25,23 @@ public class UserService : IUserService
         _userRepository = userRepository;
         _userValidator = userValidator;
         _userStateService = userStateService;
+    }
+
+    public async Task<Result<UserViewModel>> GetUserByIdAsync(int id, bool enableTracking = false)
+    {
+        var specifications = new UserByIdSpecification(id);
+
+        if (enableTracking)
+        {
+            specifications.EnableTracking();
+        }
+
+        var user = await _userRepository.GetAsync(specifications);
+
+        if (user is not null) return user.ToUserViewModel();
+
+        var message = $"A user with id '{id}' does not exists";
+        return Result<UserViewModel>.CreateNotFoundException(message);
     }
 
     public async Task<Result<UserViewModel>> GetUserByNameAsync(string login, bool enableTracking = false)
@@ -107,19 +125,20 @@ public class UserService : IUserService
 
     public async Task<Result<UserViewModel>> DeleteUserAsync(int id)
     {
-        var userRes = await GetWithGroupAndStateAsync(id);
-        if (!userRes.IsSuccessful) return new Result<UserViewModel>(userFromDb.GetException());
+        var userRes = await GetUserByIdAsync(id);
+        if (!userRes.IsSuccessful) return new Result<UserViewModel>(userRes.GetException());
 
         var state = await _userStateService.GetByCodeAsync(UserStatus.Blocked.ToString());
 
         if (state is null)
-        {
-            return user.ToUserViewModel();
-        }
+            return new Result<UserViewModel>(
+                new ServerErrorException($"Can not found user state :{UserStatus.Blocked.ToString()}"));
 
-        var userRes.GetValue().UserState = state;
+        var user = userRes.GetValue()!.ToUser();
 
-        var result = await _userRepository.DeleteAsync(userFromDb);
+        user.UserState = state;
+
+        var result = await _userRepository.DeleteAsync(user);
         if (result is not null) return result.ToUserViewModel();
 
         return Result<UserViewModel>.CreateServerErrorException($"Cant delete user with user login '{user.Login}'");
