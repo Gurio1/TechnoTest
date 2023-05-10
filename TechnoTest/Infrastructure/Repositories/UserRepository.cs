@@ -23,7 +23,6 @@ namespace TechnoTest.Infrastructure.Repositories
 
         public async Task<User?> DeleteAsync(User user)
         {
-            _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
             return user;

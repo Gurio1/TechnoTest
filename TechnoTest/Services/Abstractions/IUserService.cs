@@ -6,6 +6,7 @@ namespace TechnoTest.Services.Abstractions;
 
 public interface IUserService
 {
+    Task<Result<UserViewModel>> GetUserByIdAsync(int id, bool enableTracking = false);
     Task<Result<UserViewModel>> GetWithGroupAndStateAsync(int id, bool enableTracking = false);
     Task<Result<List<UserViewModel>>> GetAllWithGroupAndStateAsync(bool enableTracking = false);
     Task<Result<UserViewModel>> CreateAsync(User user);
