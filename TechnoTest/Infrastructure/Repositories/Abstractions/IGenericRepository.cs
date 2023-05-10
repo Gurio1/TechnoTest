@@ -7,5 +7,5 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
 {
     Task<TEntity?> GetAsync(IBaseSpecifications<TEntity> baseSpecifications);
 
-    Task<IEnumerable<TEntity>?> GetAllAsync(IBaseSpecifications<TEntity> baseSpecifications);
+    Task<List<TEntity>> GetAllAsync(IBaseSpecifications<TEntity> baseSpecifications);
 }

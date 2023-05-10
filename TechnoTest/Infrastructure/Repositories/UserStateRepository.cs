@@ -11,4 +11,12 @@ public class UserStateRepository : GenericRepository<UserState>, IUserStateRepos
     {
         _context = context;
     }
+
+    public async Task<bool> AssignUserGroupToUserAsync(UserState userState)
+    {
+        _context.UserStates.Update(userState);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

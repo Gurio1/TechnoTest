@@ -6,4 +6,5 @@ namespace TechnoTest.Infrastructure.Repositories.Abstractions;
 
 public interface IUserStateRepository : IGenericRepository<UserState>
 {
+    Task<bool> AssignUserGroupToUserAsync(UserState userState);
 }

@@ -11,11 +11,11 @@ namespace TechnoTest.Infrastructure.EntityTypeConfiguration.Identity
             builder.ToTable("Users");
 
             builder.HasOne(user => user.UserGroup)
-                .WithMany()
+                .WithMany(g => g.Users)
                 .HasForeignKey(c => c.UserGroupId);
 
             builder.HasOne(c => c.UserState)
-                .WithMany()
+                .WithMany(s => s.Users)
                 .HasForeignKey(c => c.UserStateId);
 
             builder.Property(e => e.RegistrationDate)

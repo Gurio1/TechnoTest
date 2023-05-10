@@ -23,7 +23,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return entity;
     }
 
-    public async Task<IEnumerable<TEntity>?> GetAllAsync(IBaseSpecifications<TEntity> baseSpecifications)
+    public async Task<List<TEntity>> GetAllAsync(IBaseSpecifications<TEntity> baseSpecifications)
     {
         var entities = await SpecificationEvaluator<TEntity>
             .GetQuery(_context.Set<TEntity>(), baseSpecifications)

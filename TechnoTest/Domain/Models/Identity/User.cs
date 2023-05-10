@@ -13,11 +13,5 @@ namespace TechnoTest.Domain.Models.Identity
 
         public int UserStateId { get; set; }
         public UserState UserState { get; set; } = new();
-
-        public void SetAdminDefaults()
-        {
-            UserGroup.Code = UserRole.Admin.ToString();
-            UserGroup.Description = "Administrator";
-        }
     }
 }

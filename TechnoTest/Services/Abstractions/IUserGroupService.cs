@@ -5,5 +5,7 @@ namespace TechnoTest.Services.Abstractions;
 
 public interface IUserGroupService
 {
-    Task<Result<UserGroup>> GetByCodeAsync(string code, bool enableTracking = false);
+    Task<UserGroup?> GetByCodeAsync(string code, bool enableTracking = false);
+    Task<UserGroup?> GetByCodeWithUsersAsync(string code, bool enableTracking = false);
+    Task<Result<UserGroup>> TrySetToTheUser(UserGroup userGroup);
 }

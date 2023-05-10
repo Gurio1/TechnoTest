@@ -1,4 +1,5 @@
 ﻿using TechnoTest.Contracts;
+using TechnoTest.Domain.Models.Enums;
 using TechnoTest.Domain.Models.Identity;
 
 namespace TechnoTest.Mapping;
@@ -11,6 +12,7 @@ public static class UserRegistrationToUserMapper
         {
             Login = vm.Login,
             Password = vm.Password,
+            UserGroup = new UserGroup() { Code = vm.UserGroupCode ?? UserRole.User.ToString() }
         };
     }
 }

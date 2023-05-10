@@ -6,5 +6,6 @@ namespace TechnoTest.Infrastructure.Repositories.Abstractions;
 
 public interface IUserRepository : IGenericRepository<User>
 {
-    Task<Result<User>> CreateAsync(User user);
+    Task<User?> CreateAsync(User user);
+    Task<User?> DeleteAsync(User user);
 }

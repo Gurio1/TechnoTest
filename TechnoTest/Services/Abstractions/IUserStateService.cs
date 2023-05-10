@@ -5,5 +5,6 @@ namespace TechnoTest.Services.Abstractions;
 
 public interface IUserStateService
 {
-    Task<Result<UserState>> GetByCodeAsync(string code, bool enableTracking = false);
+    Task<UserState?> GetByCodeAsync(string code, bool enableTracking = false);
+    Task<Result<UserState>> TrySetToTheNewUser(UserState userState);
 }

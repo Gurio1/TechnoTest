@@ -4,6 +4,8 @@ using TechnoTest.Services;
 using TechnoTest.Services.Abstractions;
 using TechnoTest.Services.Factory;
 using TechnoTest.Services.Factory.Abstraction;
+using TechnoTest.Validation;
+using TechnoTest.Validation.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserGroupRepository, UserGroupRepository>();
 builder.Services.AddScoped<IUserStateRepository, UserStateRepository>();
 
+builder.Services.AddScoped<IUserValidator, UserValidator>();
+builder.Services.AddScoped<IUserGroupValidator, UserGroupValidator>();
+builder.Services.AddScoped<IUserStateValidator, UserStateValidator>();
+
+builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

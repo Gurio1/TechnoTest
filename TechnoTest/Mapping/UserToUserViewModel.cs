@@ -12,8 +12,8 @@ public static class UserToUserViewModel
             Id = source.Id,
             Login = source.Login,
             RegistrationDate = source.RegistrationDate,
-            UserGroup = source.UserGroup,
-            UserState = source.UserState
+            UserGroup = source.UserGroup.ToUserGroupViewModel(),
+            UserState = source.UserState.ToUserStateViewModel()
         };
     }
 }

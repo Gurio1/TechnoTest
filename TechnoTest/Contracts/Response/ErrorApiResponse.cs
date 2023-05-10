@@ -4,7 +4,14 @@ namespace TechnoTest.Contracts.Response;
 
 public class ErrorApiResponse
 {
-    public int Status { get; set; }
-    public string TraceId { get; set; }
-    public List<string> Errors { get; init; } = new();
+    public int Status { get; }
+    public string Title { get; }
+    public string Error { get; }
+
+    public ErrorApiResponse(int status, string title, string error)
+    {
+        Status = status;
+        Title = title;
+        Error = error;
+    }
 }

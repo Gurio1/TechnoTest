@@ -1,6 +1,4 @@
-﻿using System.Net;
-using TechnoTest.Contracts;
-using TechnoTest.Domain.Exceptions;
+﻿using TechnoTest.Contracts;
 using TechnoTest.Domain.Models;
 using TechnoTest.Domain.Models.Enums;
 using TechnoTest.Domain.Models.Identity;
@@ -8,19 +6,44 @@ using TechnoTest.Infrastructure.Repositories.Abstractions;
 using TechnoTest.Mapping;
 using TechnoTest.Services.Abstractions;
 using TechnoTest.Specifications.UserSpecifications;
+using TechnoTest.Validation.Abstractions;
 
 namespace TechnoTest.Services;
 
 public class UserService : IUserService
 {
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserRepository _userRepository;
+    private readonly IUserValidator _userValidator;
+    private readonly IUserStateService _userStateService;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IUserValidator userValidator, IUserStateService userStateService,
+        IUserGroupService userGroupService)
     {
+        _userGroupService = userGroupService;
         _userRepository = userRepository;
+        _userValidator = userValidator;
+        _userStateService = userStateService;
     }
 
-    public async Task<Result<UserViewModel>> GetWithGroupAndStateAsync(int id, bool enableTracking)
+    public async Task<Result<UserViewModel>> GetUserByNameAsync(string login, bool enableTracking = false)
+    {
+        var specifications = new UserByNameSpecification(login);
+
+        if (enableTracking)
+        {
+            specifications.EnableTracking();
+        }
+
+        var user = await _userRepository.GetAsync(specifications);
+
+        if (user is not null) return user.ToUserViewModel();
+
+        var message = $"A user with name '{login}' does not exists";
+        return Result<UserViewModel>.CreateNotFoundException(message);
+    }
+
+    public async Task<Result<UserViewModel>> GetWithGroupAndStateAsync(int id, bool enableTracking = false)
     {
         var specifications = new UserWithGroupSpecification()
             .And(new UserWithStateSpecification())
@@ -36,10 +59,10 @@ public class UserService : IUserService
         if (user is not null) return new Result<UserViewModel>(user.ToUserViewModel());
 
         var message = $"A user with id '{id}' does not exists";
-        return new Result<UserViewModel>(new StatusCodeException(HttpStatusCode.NotFound, message));
+        return Result<UserViewModel>.CreateNotFoundException(message);
     }
 
-    public async Task<Result<IEnumerable<UserViewModel>>> GetAllWithGroupAndStateAsync(bool enableTracking = false)
+    public async Task<Result<List<UserViewModel>>> GetAllWithGroupAndStateAsync(bool enableTracking = false)
     {
         var specifications = new UserWithGroupSpecification()
             .And(new UserWithStateSpecification());
@@ -51,41 +74,54 @@ public class UserService : IUserService
 
         var users = await _userRepository.GetAllAsync(specifications);
 
-        if (users is not null) return new Result<IEnumerable<UserViewModel>>(users.Select(x => x.ToUserViewModel()));
+        if (users.Any()) return new List<UserViewModel>(users.Select(x => x.ToUserViewModel()));
 
-        var message = "Users who are satisfied with the specifications cannot be found.";
-        return new Result<IEnumerable<UserViewModel>>(new StatusCodeException(HttpStatusCode.NotFound, message));
+        const string message = "Users who are satisfied with the specifications cannot be found.";
+        return Result<List<UserViewModel>>.CreateNotFoundException(message);
     }
 
-    public async Task<Result<UserViewModel>> CreateAsync(User user, string role)
+    public async Task<Result<UserViewModel>> CreateAsync(User user)
     {
-        if (role == UserRole.Admin.ToString())
-        {
-            var adminUser = FindActiveAdminAsync();
+        var valRes = await _userValidator.ValidateUserAsync(this, user);
+        if (!valRes.IsSuccessful) return new Result<UserViewModel>(valRes.GetException());
 
-            if (adminUser is not null)
-            {
-                var message = $"User with role '{UserRole.Admin.ToString()}' already exist!";
-                return new Result<UserViewModel>(new StatusCodeException(HttpStatusCode.BadRequest, message));
-            }
+        var userGroupVal = await _userGroupService.TrySetToTheUser(user.UserGroup);
+        if (!userGroupVal.IsSuccessful) return new Result<UserViewModel>(userGroupVal.GetException());
 
-            user.SetAdminDefaults();
-        }
+        user.UserGroup = userGroupVal.GetValue()!;
+
+        var userStateVal = await _userStateService.TrySetToTheNewUser(user.UserState);
+        if (!userStateVal.IsSuccessful) return new Result<UserViewModel>(userStateVal.GetException());
+
+        user.UserState = userStateVal.GetValue()!;
 
         user.RegistrationDate = DateTime.UtcNow;
 
         var result = await _userRepository.CreateAsync(user);
 
-        return new Result<UserViewModel>(result.GetValue().ToUserViewModel());
+        if (result is not null) return result.ToUserViewModel();
+
+        return Result<UserViewModel>.CreateServerErrorException(
+            $"An error occured when trying to add user with user login '{user.Login}' to the DB");
     }
 
-    private async Task<User?>? FindActiveAdminAsync()
+    public async Task<Result<UserViewModel>> DeleteUserAsync(int id)
     {
-        var specifications = new ActiveUsersSpecification()
-            .And(new AdminUserSpecification());
+        var userRes = await GetWithGroupAndStateAsync(id);
+        if (!userRes.IsSuccessful) return new Result<UserViewModel>(userFromDb.GetException());
 
-        var user = await _userRepository.GetAsync(specifications);
+        var state = await _userStateService.GetByCodeAsync(UserStatus.Blocked.ToString());
 
-        return user;
+        if (state is null)
+        {
+            return user.ToUserViewModel();
+        }
+
+        var userRes.GetValue().UserState = state;
+
+        var result = await _userRepository.DeleteAsync(userFromDb);
+        if (result is not null) return result.ToUserViewModel();
+
+        return Result<UserViewModel>.CreateServerErrorException($"Cant delete user with user login '{user.Login}'");
     }
 }

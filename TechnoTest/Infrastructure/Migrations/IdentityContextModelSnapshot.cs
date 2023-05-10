@@ -22,7 +22,7 @@ namespace TechnoTest.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TechnoTest.Models.Identity.User", b =>
+            modelBuilder.Entity("TechnoTest.Domain.Models.Identity.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,9 +31,11 @@ namespace TechnoTest.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Login")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("RegistrationDate")
@@ -54,7 +56,7 @@ namespace TechnoTest.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("TechnoTest.Models.Identity.UserGroup", b =>
+            modelBuilder.Entity("TechnoTest.Domain.Models.Identity.UserGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,6 +70,7 @@ namespace TechnoTest.Infrastructure.Migrations
                         .HasColumnType("character varying(40)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
@@ -90,7 +93,7 @@ namespace TechnoTest.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TechnoTest.Models.Identity.UserState", b =>
+            modelBuilder.Entity("TechnoTest.Domain.Models.Identity.UserState", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,6 +107,7 @@ namespace TechnoTest.Infrastructure.Migrations
                         .HasColumnType("character varying(40)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
@@ -126,16 +130,16 @@ namespace TechnoTest.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TechnoTest.Models.Identity.User", b =>
+            modelBuilder.Entity("TechnoTest.Domain.Models.Identity.User", b =>
                 {
-                    b.HasOne("TechnoTest.Models.Identity.UserGroup", "UserGroup")
-                        .WithMany()
+                    b.HasOne("TechnoTest.Domain.Models.Identity.UserGroup", "UserGroup")
+                        .WithMany("Users")
                         .HasForeignKey("UserGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TechnoTest.Models.Identity.UserState", "UserState")
-                        .WithMany()
+                    b.HasOne("TechnoTest.Domain.Models.Identity.UserState", "UserState")
+                        .WithMany("Users")
                         .HasForeignKey("UserStateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -143,6 +147,16 @@ namespace TechnoTest.Infrastructure.Migrations
                     b.Navigation("UserGroup");
 
                     b.Navigation("UserState");
+                });
+
+            modelBuilder.Entity("TechnoTest.Domain.Models.Identity.UserGroup", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("TechnoTest.Domain.Models.Identity.UserState", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
